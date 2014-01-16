@@ -1,6 +1,6 @@
 {
   "name": "gulp-gitmodified",
-  "version": "0.0.1-alpha",
+  "version": "0.0.1-1",
   "description": "A plugin for Gulp to get an object stream of modified files on git.",
   "keywords": [
     "gulpplugin",
