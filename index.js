@@ -1,6 +1,7 @@
 var through = require("through2"),
-  exec = require("child_process").exec,
+  exec = require("child_process").execFile,
   find = require("lodash.find"),
+  which = require("which")
   gutil = require("gulp-util");
 
 module.exports = function (param) {
@@ -10,19 +11,26 @@ module.exports = function (param) {
       gitApp = 'git',
       gitExtra = {env: process.env};
 
-  var getGitStatus = function (callback) {
-    exec(gitApp + " " + [ "status", "--porcelain" ].join(' '), gitExtra, function (err, stdout, stderr) {
-      if (err) {
-        return callback(err);
-      }
-      // makeCommit parly inspired and taken from NPM version module
-      var lines = stdout.trim().split("\n").filter(function (line) {
-        return line.trim() && !line.match(/^\?\? /)
-      }).map(function (line) {
-        return line.trim().substring(2);
-      });
+  var getGitStatus = function (cb) {
 
-      return callback(null, lines);
+    which(gitApp, function (err) {
+      if (err) {
+        return cb(new Error('git not found on your system.'))
+      }
+
+      exec(gitApp, [ "status", "--porcelain" ], gitExtra, function (err, stdout, stderr) {
+        if (err) {
+          return cb(new Error('Could not get git status --porcelain'));
+        }
+        // makeCommit parly inspired and taken from NPM version module
+        var lines = stdout.trim().split("\n").filter(function (line) {
+          return line.trim() && !line.match(/^\?\? /)
+        }).map(function (line) {
+          return line.trim().substring(2);
+        });
+
+        return cb(null, lines);
+      });
     });
   };
 
@@ -48,14 +56,14 @@ module.exports = function (param) {
       return callback();
     };
 
-    if (files) {
+    if (!!files) {
       return checkStatus();
     }
 
     getGitStatus(function (err, statusFiles) {
       if (err) {
         stream.emit('error', new gutil.PluginError('gulp-gitmodified', err));
-        callback();
+        return callback();
       }
       files = statusFiles;
       checkStatus();
@@ -64,6 +72,6 @@ module.exports = function (param) {
 
   return through.obj(gitmodified, function (callback) {
     files = null;
-    callback();
+    return callback();
   });
 };

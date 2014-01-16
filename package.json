@@ -3,7 +3,9 @@
   "version": "0.0.1-alpha",
   "description": "A plugin for Gulp to get an object stream of modified files on git.",
   "keywords": [
-    "gulpplugin", "git", "git modified"
+    "gulpplugin",
+    "git",
+    "git modified"
   ],
   "homepage": "https://github.com/mikaelbr/gulp-gitmodified",
   "bugs": "https://github.com/mikaelbr/gulp-gitmodified/issues",
@@ -23,7 +25,8 @@
   "dependencies": {
     "through2": "*",
     "gulp-util": "~2.2.0",
-    "lodash.find": "~2.4.1"
+    "lodash.find": "~2.4.1",
+    "which": "~1.0.5",
   },
   "devDependencies": {
     "mocha": "*",
