@@ -1,15 +1,15 @@
 {
   "name": "gulp-gitmodified",
-  "version": "0.0.0",
-  "description": "A plugin for Gulp",
+  "version": "0.0.1-alpha",
+  "description": "A plugin for Gulp to get an object stream of modified files on git.",
   "keywords": [
-    "gulpplugin"
+    "gulpplugin", "git", "git modified"
   ],
   "homepage": "https://github.com/mikaelbr/gulp-gitmodified",
   "bugs": "https://github.com/mikaelbr/gulp-gitmodified/issues",
   "author": {
     "name": "Mikael Brevik",
-    "email": "",
+    "email": "mikaelbre@gmail.com",
     "url": "https://github.com/mikaelbr"
   },
   "main": "./index.js",
@@ -18,21 +18,15 @@
     "url": "git://github.com/mikaelbr/gulp-gitmodified.git"
   },
   "scripts": {
-    "test": "istanbul test _mocha --report html -- test/*.js --reporter spec",
-    "coveralls": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+    "test": "mocha -R spec"
   },
   "dependencies": {
     "through2": "*",
     "gulp-util": "~2.2.0",
-    "lodash.first": "~2.4.1",
     "lodash.find": "~2.4.1"
   },
   "devDependencies": {
     "mocha": "*",
-    "coveralls": "*",
-    "mocha-lcov-reporter": "*",
-    "istanbul": "*",
-    "event-stream": "*",
     "should": "~2.1.0"
   },
   "engines": {

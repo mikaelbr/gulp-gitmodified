@@ -1,11 +1,13 @@
-(PLUGIN AUTHOR: Please read [Plugin README conventions](https://github.com/wearefractal/gulp/wiki/Plugin-README-Conventions), then delete this line)
-
 # gulp-gitmodified
-[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url]  [![Coverage Status](coveralls-image)](coveralls-url) [![Dependency Status][depstat-image]][depstat-url]
+[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][depstat-image]][depstat-url]
 
-> gitmodified plugin for [gulp](https://github.com/wearefractal/gulp)
+> gitmodified plugin for [gulp](https://github.com/gulpjs/gulp)
 
 ## Usage
+
+A plugin for Gulp to get an object stream of modified files on git.
+
+**Note:** Highly experimental. There is no tests yet and it's in early alpha. Tests will come soon.
 
 First, install `gulp-gitmodified` as a development dependency:
 
@@ -18,23 +20,17 @@ Then, add it to your `gulpfile.js`:
 ```javascript
 var gitmodified = require("gulp-gitmodified");
 
-gulp.src("./src/*.ext")
-	.pipe(gitmodified({
-		msg: "Hello Gulp!"
-	}))
-	.pipe(gulp.dest("./dist"));
+var files = gulp.src("./src/*.ext")
+	.pipe(gitmodified())
+
+files.on('data', function (file) {
+  console.log("Modified file:", file);
+})
 ```
 
 ## API
 
-### gitmodified(options)
-
-#### options.msg
-Type: `String`  
-Default: `Hello World`
-
-The message you wish to attach to file.
-
+### gitmodified()
 
 ## License
 
@@ -45,9 +41,6 @@ The message you wish to attach to file.
 
 [travis-url]: http://travis-ci.org/mikaelbr/gulp-gitmodified
 [travis-image]: https://secure.travis-ci.org/mikaelbr/gulp-gitmodified.png?branch=master
-
-[coveralls-url]: https://coveralls.io/r/mikaelbr/gulp-gitmodified
-[coveralls-image]: https://coveralls.io/repos/mikaelbr/gulp-gitmodified/badge.png
 
 [depstat-url]: https://david-dm.org/mikaelbr/gulp-gitmodified
 [depstat-image]: https://david-dm.org/mikaelbr/gulp-gitmodified.png
