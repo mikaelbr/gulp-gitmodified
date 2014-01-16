@@ -29,6 +29,7 @@
     "which": "~1.0.5",
   },
   "devDependencies": {
+    "gulp": "~3.3.4",
     "mocha": "*",
     "should": "~2.1.0"
   },

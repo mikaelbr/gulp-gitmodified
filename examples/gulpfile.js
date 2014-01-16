@@ -3,15 +3,17 @@ var gulp = require("gulp"),
     gitmodified = require("../");
 
 gulp.task("foo", function () {
-  var data = gulp.src(["../*.js", "../test/*.js"])
+  var data = gulp.src(["../**/*", "!../node_modules/**"])
     .pipe(through.obj(function (file, enc, cb) {
-      console.log(file);
       this.push(file);
       return cb();
     }))
     .pipe(gitmodified())
+    .on('error', function (err) {
+      console.log(err);
+    })
     .pipe(through.obj(function (file, enc, cb) {
-      console.log(file.relative);
+      console.log("Modified: ", file.relative);
       this.push(file);
       return cb();
     }));
