@@ -48,6 +48,8 @@ U = updated but unmerged
 !! = ignored
 ```
 
+(and more if in short format (e.g. AM), see Short Format on [git status man page](https://www.kernel.org/pub/software/scm/git/docs/git-status.html))
+
 Can also use string representation. Examples:
 
 ```javascript
