@@ -46,6 +46,8 @@ D = deleted
 R = renamed
 C = copied
 U = updated but unmerged
+?? = untracked
+!! = ignored
 ```
 
 Can also use string representation. Examples:

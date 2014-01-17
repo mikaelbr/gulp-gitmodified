@@ -19,8 +19,8 @@ module.exports = function (mode) {
     renamed: 'R',
     copied: 'C',
     updated: 'U',
-    untracked: '?',
-    ignored: '!'
+    untracked: '??',
+    ignored: '!!'
   };
 
   if (mode && !!modeMapping[mode.trim().toLowerCase()]) {
