@@ -15,6 +15,5 @@ gulp.task("foo", function () {
     .pipe(through.obj(function (file, enc, cb) {
       console.log("Modified: ", file.relative);
       this.push(file);
-      return cb();
-    }));
+      return cb()    }));
 });
