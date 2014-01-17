@@ -21,16 +21,52 @@ Then, add it to your `gulpfile.js`:
 var gitmodified = require("gulp-gitmodified");
 
 var files = gulp.src("./src/*.ext")
-	.pipe(gitmodified())
+	.pipe(gitmodified('modified'))
 
 files.on('data', function (file) {
   console.log("Modified file:", file);
-})
+});
 ```
 
 ## API
 
-### gitmodified()
+### gitmodified(statusMode)
+
+#### statusMode
+Type: `String`  
+Default: "modified"
+
+What status mode to look for. From git documentation:
+
+```
+' ' = unmodified
+M = modified
+A = added
+D = deleted
+R = renamed
+C = copied
+U = updated but unmerged
+```
+
+Can also use string representation. Examples:
+
+```javascript
+// All added files
+gulp.src('./**/*')
+    .pipe(gitmodified('added'))
+```
+
+```javascript
+// Equal to the one before
+gulp.src('./**/*')
+    .pipe(gitmodified('A'))
+```
+
+```javascript
+// All deleted files.
+gulp.src('./**/*')
+    .pipe(gitmodified('deleted'))
+```
 
 ## License
 

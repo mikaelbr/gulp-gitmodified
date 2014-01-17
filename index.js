@@ -4,12 +4,30 @@ var through = require("through2"),
   which = require("which")
   gutil = require("gulp-util");
 
-module.exports = function (param) {
+module.exports = function (mode) {
   "use strict";
 
   var files = null,
       gitApp = 'git',
-      gitExtra = {env: process.env};
+      gitExtra = {env: process.env},
+      regexTest,
+      modeMapping = {
+    unmodified: '\\s',
+    modified: 'M',
+    added: 'A',
+    deleted: 'D',
+    renamed: 'R',
+    copied: 'C',
+    updated: 'U',
+    untracked: '?',
+    ignored: '!'
+  };
+
+  if (mode && !!modeMapping[mode.trim().toLowerCase()]) {
+    mode = modeMapping[mode.trim().toLowerCase()];
+  }
+  mode = (mode || 'M').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+  regexTest = new RegExp("^"+mode+"\\s", "i");
 
   var getGitStatus = function (cb) {
 
@@ -24,11 +42,10 @@ module.exports = function (param) {
         }
         // makeCommit parly inspired and taken from NPM version module
         var lines = stdout.trim().split("\n").filter(function (line) {
-          return line.trim() && !line.match(/^\?\? /)
+          return line.trim() && regexTest.test(line.trim());
         }).map(function (line) {
-          return line.trim().substring(2);
+          return line.trim().replace(regexTest, "");
         });
-
         return cb(null, lines);
       });
     });
