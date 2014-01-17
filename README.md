@@ -5,9 +5,7 @@
 
 ## Usage
 
-A plugin for Gulp to get an object stream of modified files on git.
-
-**Note:** Highly experimental. There is no tests yet and it's in early alpha. Tests will come soon.
+A plugin for Gulp to get an object stream of git status files on git (e.g. modified, deleted, untracked, etc).
 
 First, install `gulp-gitmodified` as a development dependency:
 
