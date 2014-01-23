@@ -3,6 +3,7 @@
 
 var should = require("should"),
   through = require("through2"),
+  fs = require("fs"),
   join = require("path").join,
   git = require("../lib/git");
 
@@ -65,7 +66,6 @@ describe("gulp-gitmodified", function () {
       cb(null, ["a.txt"]);
     };
     var instream = gulp.src(filePath);
-    var outstream = gitmodified("modified");
     instream
       .pipe(gitmodified("deleted"))
       .pipe(through.obj(function(file, enc, cb) {
@@ -124,6 +124,49 @@ describe("gulp-gitmodified", function () {
         callback();
         done();
       }));
+  });
+
+  it('should handle streamed files', function (done) {
+    var streamedFile = new gutil.File({
+      path: "test/fixtures/a.txt",
+      cwd: "test/",
+      base: "test/fixtures/",
+      contents: fs.createReadStream("test/fixtures/a.txt")
+    });
+
+    git.getStatusByMatcher = function (tester, cb) {
+      cb(null, ["a.txt"]);
+    };
+    var outstream = gitmodified();
+    outstream.on('data', function(file) {
+      should.exist(file);
+      should.exist(file.path);
+      should.exist(file.contents);
+      should.exist(file.isStream());
+      file.contents.should.equal(streamedFile.contents);
+      done();
+    });
+
+    outstream.write(streamedFile);
+  });
+
+  it('should handle folders', function (done) {
+    git.getStatusByMatcher = function (tester, cb) {
+      cb(null, ["fixtures/"]);
+    };
+
+    var instream = gulp.src(join(__dirname, "./fixtures"));
+    var outstream = gitmodified();
+
+    outstream.on('data', function(file) {
+      should.exist(file);
+      should.exist(file.path);
+      file.relative.should.equal('fixtures');
+      should.exist(file.isNull());
+      done();
+    });
+
+    instream.pipe(outstream);
   });
 
 });

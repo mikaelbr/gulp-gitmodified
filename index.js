@@ -29,16 +29,11 @@ module.exports = function (mode) {
   var gitmodified = function (file, enc, callback) {
     var stream = this;
 
-    if (file.isNull()) {
-      return callback();
-    }
-    if (file.isStream()) {
-      this.emit('error', new gutil.PluginError('gulp-gitmodified', 'Stream content is not supported'));
-      return callback();
-    }
-
     var checkStatus = function () {
-      var isIn = find(files, function (line) {
+      var isIn = !!find(files, function (line) {
+        if (line.substring(line.length, line.length - 1)) {
+          return file.path.indexOf(line.substring(0, line.length - 1)) !== -1;
+        }
         return file.path.indexOf(line) !== -1;
       });
 
