@@ -131,7 +131,7 @@ describe("gulp-gitmodified", function () {
       path: "test/fixtures/a.txt",
       cwd: "test/",
       base: "test/fixtures/",
-      contents: fs.createReadStream("test/fixtures/a.txt")
+      contents: fs.createReadStream(join(__dirname, "/fixtures/a.txt"))
     });
 
     git.getStatusByMatcher = function (tester, cb) {
@@ -142,6 +142,7 @@ describe("gulp-gitmodified", function () {
       should.exist(file);
       should.exist(file.path);
       should.exist(file.contents);
+      should(file.isNull()).not.equal(true);
       should.exist(file.isStream());
       file.contents.should.equal(streamedFile.contents);
       done();
