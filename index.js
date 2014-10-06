@@ -1,10 +1,11 @@
-var through = require("through2"),
-  find = require("lodash.find"),
-  gutil = require("gulp-util"),
-  git = require("./lib/git");
+var through = require('through2'),
+  find = require('lodash.find'),
+  gutil = require('gulp-util'),
+  git = require('./lib/git'),
+  File = require('vinyl');
 
 module.exports = function (mode) {
-  "use strict";
+  'use strict';
 
   var files = null,
       regexTest,
@@ -23,8 +24,8 @@ module.exports = function (mode) {
   if (mode && !!modeMapping[mode.trim().toLowerCase()]) {
     mode = modeMapping[mode.trim().toLowerCase()];
   }
-  mode = (mode || 'M').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-  regexTest = new RegExp("^"+mode+"\\s", "i");
+  mode = (mode || 'M').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+  regexTest = new RegExp('^'+mode+'\\s', 'i');
 
   var gitmodified = function (file, enc, callback) {
     var stream = this;
@@ -38,6 +39,7 @@ module.exports = function (mode) {
       });
 
       if (isIn) {
+        setDeleted(file, false);
         stream.push(file);
       }
       return callback();
@@ -52,12 +54,33 @@ module.exports = function (mode) {
         return callback();
       }
       files = statusFiles;
+
+      if (mode === 'D') {
+        // Deleted files. Make into vinyl files
+        files.map(makeVinylFile).forEach(function (file) {
+          stream.push(file);
+        });
+      }
+
       checkStatus();
     });
-  }
+  };
 
   return through.obj(gitmodified, function (callback) {
     files = null;
     return callback();
   });
 };
+
+function makeVinylFile (path) {
+  var file = new File({
+    path: path,
+    contents: null
+  });
+  setDeleted(file, true);
+  return file;
+}
+
+function setDeleted (file, isDeleted) {
+  file.isDeleted = function () { return !!isDeleted; };
+}

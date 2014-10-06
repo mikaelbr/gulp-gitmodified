@@ -30,6 +30,10 @@ files.on('data', function (file) {
 
 ### gitmodified(statusMode)
 
+`gulp-gitmodified` extends the vinyl file format gulp uses to have a method
+for checking if file is deleted. isDeleted is true if checking for deleted
+files (see below), and false otherwise.
+
 #### statusMode
 Type: `String`  
 Default: "modified"
@@ -68,6 +72,9 @@ gulp.src('./**/*')
 // All deleted files.
 gulp.src('./**/*')
     .pipe(gitmodified('deleted'))
+		.on('data', function (file) {
+			console.log(file.isDeleted()); //=> true
+		})
 ```
 
 ## License

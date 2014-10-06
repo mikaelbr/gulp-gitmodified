@@ -67,12 +67,27 @@ describe("gulp-gitmodified", function () {
     };
     var instream = gulp.src(filePath);
     instream
-      .pipe(gitmodified("deleted"))
+      .pipe(gitmodified("modified"))
       .pipe(through.obj(function(file, enc, cb) {
         should.exist(file);
         should.exist(file.path);
         should.exist(file.contents);
         file.path.should.equal(expectedFile);
+        done();
+      }));
+  });
+
+  it("should return deleted files", function (done) {
+    git.getStatusByMatcher = function (tester, cb) {
+      cb(null, ["a.txt"]);
+    };
+    var instream = gulp.src(filePath);
+    instream
+      .pipe(gitmodified('D'))
+      .pipe(through.obj(function(file, enc, cb) {
+        should.exist(file);
+        should.exist(file.isDeleted());
+        should.not.exist(file.contents);
         done();
       }));
   });
