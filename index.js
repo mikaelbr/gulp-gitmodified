@@ -10,7 +10,6 @@ module.exports = function (modes) {
   var files = null,
       regexTest,
       modeMapping = {
-    unmodified: ' ',
     modified: 'M',
     added: 'A',
     deleted: 'D',

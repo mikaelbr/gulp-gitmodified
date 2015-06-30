@@ -20,7 +20,7 @@ describe("gulp-gitmodified", function () {
       app.should.equal("git");
       cb(null, "");
     };
-    git.getStatusByMatcher(new RegExp("^( )\\s", "i"), function (err) {
+    git.getStatusByMatcher(new RegExp("^(M)\\s", "i"), function (err) {
       should(err).equal(null);
       fnCalls.should.equal(2);
       done();
@@ -35,7 +35,7 @@ describe("gulp-gitmodified", function () {
     git.exec = function (app, args, extra, cb) {
       cb(null, "");
     };
-    git.getStatusByMatcher(new RegExp("^( )\\s", "i"), function (err) {
+    git.getStatusByMatcher(new RegExp("^(M)\\s", "i"), function (err) {
       should(err.message).equal("git not found on your system.");
       done();
     });
@@ -114,13 +114,13 @@ describe("gulp-gitmodified", function () {
       cb();
     };
     git.exec = function (app, args, extra, cb) {
-      cb(null, "M index.js\n?? foo.js\n  bar.js\n!! baz.js");
+      cb(null, "C index.js\n?? foo.js\n  bar.js\n!! baz.js");
     };
-    git.getStatusByMatcher(new RegExp("^( |!!|\\?\\?)\\s", "i"), function (err, data) {
+    git.getStatusByMatcher(new RegExp("^(C|!!|\\?\\?)\\s", "i"), function (err, data) {
       should.not.exist(err);
       data.length.should.equal(3);
-      data[0].should.eql({ mode: '??', path: 'foo.js' });
-      data[1].should.eql({ mode: '', path: 'bar.js' });
+      data[0].should.eql({ mode: 'C', path: 'index.js' });
+      data[1].should.eql({ mode: '??', path: 'foo.js' });
       data[2].should.eql({ mode: '!!', path: 'baz.js' });
       done();
     });

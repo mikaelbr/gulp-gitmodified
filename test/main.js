@@ -73,15 +73,6 @@ describe("gulp-gitmodified", function () {
   });
 
   describe("map mode from named string to short hand", function () {
-    it("should map for 'unmodified'", function (done) {
-      git.getStatusByMatcher = function (tester, cb) {
-        tester.toString().should.equal("/^( )\\s/i");
-        done();
-      };
-      var instream = gulp.src(filePath);
-      instream.pipe(gitmodified("unmodified"));
-    });
-
     it("should map for 'modified'", function (done) {
       git.getStatusByMatcher = function (tester, cb) {
         tester.toString().should.equal("/^(M)\\s/i");
@@ -156,11 +147,11 @@ describe("gulp-gitmodified", function () {
 
     it("should map multiple modes from named strings to multiple short hand", function (done) {
       git.getStatusByMatcher = function (tester, cb) {
-        tester.toString().should.equal("/^(A|D| |\\?\\?)\\s/i");
+        tester.toString().should.equal("/^(A|D|\\?\\?)\\s/i");
         done();
       };
       var instream = gulp.src(filePath);
-      instream.pipe(gitmodified(["added", "deleted", "unmodified", "untracked"]));
+      instream.pipe(gitmodified(["added", "deleted", "untracked"]));
     });
   });
 
