@@ -36,34 +36,137 @@ describe("gulp-gitmodified", function () {
 
   it("should default to modified mode", function (done) {
     git.getStatusByMatcher = function (tester) {
-      tester.toString().should.equal("/^M\\s/i");
+      tester.toString().should.equal("/^(M)\\s/i");
       done();
     };
     var instream = gulp.src(filePath);
     instream.pipe(gitmodified());
   });
 
-  it("should map mode from named string to short hand", function (done) {
-    git.getStatusByMatcher = function (tester) {
-      tester.toString().should.equal("/^M\\s/i");
-      done();
-    };
-    var instream = gulp.src(filePath);
-    instream.pipe(gitmodified("modified"));
+  describe("acccept custom input", function () {
+    it("should allow short hand", function (done) {
+      git.getStatusByMatcher = function (tester) {
+        tester.toString().should.equal("/^(A)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("A"));
+    });
+
+    it("should allow multiple separated short hands", function (done) {
+      git.getStatusByMatcher = function (tester) {
+        tester.toString().should.equal("/^(A|D)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified(["A", "D"]));
+    });
+
+    it("should allow any value", function (done) {
+      git.getStatusByMatcher = function (tester) {
+        tester.toString().should.equal("/^(foo)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("foo"));
+    });
   });
 
-  it("should map deleted mode from named string to short hand", function (done) {
-    git.getStatusByMatcher = function (tester) {
-      tester.toString().should.equal("/^D\\s/i");
-      done();
-    };
-    var instream = gulp.src(filePath);
-    instream.pipe(gitmodified("deleted"));
+  describe("map mode from named string to short hand", function () {
+    it("should map for 'unmodified'", function (done) {
+      git.getStatusByMatcher = function (tester, cb) {
+        tester.toString().should.equal("/^( )\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("unmodified"));
+    });
+
+    it("should map for 'modified'", function (done) {
+      git.getStatusByMatcher = function (tester, cb) {
+        tester.toString().should.equal("/^(M)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("modified"));
+    });
+
+    it("should map for 'added'", function (done) {
+      git.getStatusByMatcher = function (tester, cb) {
+        tester.toString().should.equal("/^(A)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("added"));
+    });
+
+    it("should map for 'deleted'", function (done) {
+      git.getStatusByMatcher = function (tester, cb) {
+        tester.toString().should.equal("/^(D)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("deleted"));
+    });
+
+    it("should map for 'renamed'", function (done) {
+      git.getStatusByMatcher = function (tester, cb) {
+        tester.toString().should.equal("/^(R)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("renamed"));
+    });
+
+    it("should map for 'copied'", function (done) {
+      git.getStatusByMatcher = function (tester, cb) {
+        tester.toString().should.equal("/^(C)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("copied"));
+    });
+
+    it("should map for 'updated'", function (done) {
+      git.getStatusByMatcher = function (tester, cb) {
+        tester.toString().should.equal("/^(U)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("updated"));
+    });
+
+    it("should map for 'untracked'", function (done) {
+      git.getStatusByMatcher = function (tester, cb) {
+        tester.toString().should.equal("/^(\\?\\?)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("untracked"));
+    });
+
+    it("should map for 'ignored'", function (done) {
+      git.getStatusByMatcher = function (tester, cb) {
+        tester.toString().should.equal("/^(!!)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified("ignored"));
+    });
+
+    it("should map multiple modes from named strings to multiple short hand", function (done) {
+      git.getStatusByMatcher = function (tester, cb) {
+        tester.toString().should.equal("/^(A|D| |\\?\\?)\\s/i");
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified(["added", "deleted", "unmodified", "untracked"]));
+    });
   });
 
   it("should return modified files", function (done) {
     git.getStatusByMatcher = function (tester, cb) {
-      cb(null, ["a.txt"]);
+      cb(null, [{ path: "a.txt", mode: "M" }]);
     };
     var instream = gulp.src(filePath);
     instream
@@ -79,11 +182,11 @@ describe("gulp-gitmodified", function () {
 
   it("should return deleted files", function (done) {
     git.getStatusByMatcher = function (tester, cb) {
-      cb(null, ["a.txt"]);
+      cb(null, [{ path: "a.txt", mode: "D" }]);
     };
     var instream = gulp.src(filePath);
     instream
-      .pipe(gitmodified("D"))
+      .pipe(gitmodified("deleted"))
       .pipe(through.obj(function(file) {
         should.exist(file);
         should.exist(file.isDeleted());
@@ -147,7 +250,7 @@ describe("gulp-gitmodified", function () {
     });
 
     git.getStatusByMatcher = function (tester, cb) {
-      cb(null, ["a.txt"]);
+      cb(null, [{ path: "a.txt", mode: "M" }]);
     };
     var outstream = gitmodified();
     outstream.on("data", function(file) {
@@ -165,7 +268,7 @@ describe("gulp-gitmodified", function () {
 
   it("should handle folders", function (done) {
     git.getStatusByMatcher = function (tester, cb) {
-      cb(null, ["fixtures/"]);
+      cb(null, [{ path: "fixtures/", mode: "M" }]);
     };
 
     var instream = gulp.src(join(__dirname, "./fixtures"));

@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "through2": "*",
-    "lodash.find": "~2.4.1",
+    "lodash": "~2.4.1",
     "which": "~1.0.5",
     "gulp-util": "~2.2.12",
     "vinyl": "^0.4.3"
