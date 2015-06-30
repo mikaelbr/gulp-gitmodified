@@ -20,7 +20,8 @@
     "url": "git://github.com/mikaelbr/gulp-gitmodified.git"
   },
   "scripts": {
-    "test": "mocha -R spec"
+    "test": "mocha -R spec",
+    "lint": "jshint **/*.js"
   },
   "dependencies": {
     "through2": "*",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "gulp": "~3.3.4",
+    "jshint": "~2.8.0",
     "mocha": "*",
     "should": "~2.1.0"
   },
@@ -38,9 +40,5 @@
     "node": ">=0.8.0",
     "npm": ">=1.2.10"
   },
-  "licenses": [
-    {
-      "type": "MIT"
-    }
-  ]
+  "license": "MIT"
 }

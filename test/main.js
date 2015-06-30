@@ -26,7 +26,7 @@ describe("gulp-gitmodified", function () {
   });
 
   it("should call git library with a tester", function (done) {
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester) {
       should.exist(tester);
       done();
     };
@@ -35,7 +35,7 @@ describe("gulp-gitmodified", function () {
   });
 
   it("should default to modified mode", function (done) {
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester) {
       tester.toString().should.equal("/^M\\s/i");
       done();
     };
@@ -44,7 +44,7 @@ describe("gulp-gitmodified", function () {
   });
 
   it("should map mode from named string to short hand", function (done) {
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester) {
       tester.toString().should.equal("/^M\\s/i");
       done();
     };
@@ -53,7 +53,7 @@ describe("gulp-gitmodified", function () {
   });
 
   it("should map deleted mode from named string to short hand", function (done) {
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester) {
       tester.toString().should.equal("/^D\\s/i");
       done();
     };
@@ -68,7 +68,7 @@ describe("gulp-gitmodified", function () {
     var instream = gulp.src(filePath);
     instream
       .pipe(gitmodified("modified"))
-      .pipe(through.obj(function(file, enc, cb) {
+      .pipe(through.obj(function(file) {
         should.exist(file);
         should.exist(file.path);
         should.exist(file.contents);
@@ -83,8 +83,8 @@ describe("gulp-gitmodified", function () {
     };
     var instream = gulp.src(filePath);
     instream
-      .pipe(gitmodified('D'))
-      .pipe(through.obj(function(file, enc, cb) {
+      .pipe(gitmodified("D"))
+      .pipe(through.obj(function(file) {
         should.exist(file);
         should.exist(file.isDeleted());
         should.not.exist(file.contents);
@@ -97,10 +97,9 @@ describe("gulp-gitmodified", function () {
       return cb(new Error("new error"));
     };
     var instream = gulp.src(filePath);
-    var outstream = gitmodified();
     instream
       .pipe(gitmodified())
-      .on('error', function (err) {
+      .on("error", function (err) {
         should.exist(err);
         err.message.should.equal("new error");
         done();
@@ -112,10 +111,9 @@ describe("gulp-gitmodified", function () {
       return cb(new Error("new error"));
     };
     var instream = gulp.src(filePath);
-    var outstream = gitmodified();
     instream
       .pipe(gitmodified())
-      .on('error', function (err) {
+      .on("error", function (err) {
         should.exist(err.plugin);
         err.plugin.should.equal("gulp-gitmodified");
         done();
@@ -128,10 +126,9 @@ describe("gulp-gitmodified", function () {
       cb(null, []);
     };
     var instream = gulp.src(filePath);
-    var outstream = gitmodified();
     instream
       .pipe(gitmodified("deleted"))
-      .pipe(through.obj(function(file, enc, cb) {
+      .pipe(through.obj(function() {
         ++numFiles;
         done();
       }, function (callback) {
@@ -141,7 +138,7 @@ describe("gulp-gitmodified", function () {
       }));
   });
 
-  it('should handle streamed files', function (done) {
+  it("should handle streamed files", function (done) {
     var streamedFile = new gutil.File({
       path: "test/fixtures/a.txt",
       cwd: "test/",
@@ -153,7 +150,7 @@ describe("gulp-gitmodified", function () {
       cb(null, ["a.txt"]);
     };
     var outstream = gitmodified();
-    outstream.on('data', function(file) {
+    outstream.on("data", function(file) {
       should.exist(file);
       should.exist(file.path);
       should.exist(file.contents);
@@ -166,7 +163,7 @@ describe("gulp-gitmodified", function () {
     outstream.write(streamedFile);
   });
 
-  it('should handle folders', function (done) {
+  it("should handle folders", function (done) {
     git.getStatusByMatcher = function (tester, cb) {
       cb(null, ["fixtures/"]);
     };
@@ -174,10 +171,10 @@ describe("gulp-gitmodified", function () {
     var instream = gulp.src(join(__dirname, "./fixtures"));
     var outstream = gitmodified();
 
-    outstream.on('data', function(file) {
+    outstream.on("data", function(file) {
       should.exist(file);
       should.exist(file.path);
-      file.relative.should.equal('fixtures');
+      file.relative.should.equal("fixtures");
       should.exist(file.isNull());
       done();
     });

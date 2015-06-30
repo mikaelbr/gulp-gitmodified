@@ -52,7 +52,7 @@ describe("gulp-gitmodified", function () {
       should.not.exist(err);
       should.exist(data);
       should.exist(data[0]);
-      data[0].should.equal('index.js');
+      data[0].should.equal("index.js");
       done();
     });
   });
