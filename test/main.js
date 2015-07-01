@@ -74,7 +74,7 @@ describe("gulp-gitmodified", function () {
 
   describe("map mode from named string to short hand", function () {
     it("should map for 'modified'", function (done) {
-      git.getStatusByMatcher = function (tester, cb) {
+      git.getStatusByMatcher = function (tester) {
         tester.toString().should.equal("/^(M)\\s/i");
         done();
       };
@@ -83,7 +83,7 @@ describe("gulp-gitmodified", function () {
     });
 
     it("should map for 'added'", function (done) {
-      git.getStatusByMatcher = function (tester, cb) {
+      git.getStatusByMatcher = function (tester) {
         tester.toString().should.equal("/^(A)\\s/i");
         done();
       };
@@ -92,7 +92,7 @@ describe("gulp-gitmodified", function () {
     });
 
     it("should map for 'deleted'", function (done) {
-      git.getStatusByMatcher = function (tester, cb) {
+      git.getStatusByMatcher = function (tester) {
         tester.toString().should.equal("/^(D)\\s/i");
         done();
       };
@@ -101,7 +101,7 @@ describe("gulp-gitmodified", function () {
     });
 
     it("should map for 'renamed'", function (done) {
-      git.getStatusByMatcher = function (tester, cb) {
+      git.getStatusByMatcher = function (tester) {
         tester.toString().should.equal("/^(R)\\s/i");
         done();
       };
@@ -110,7 +110,7 @@ describe("gulp-gitmodified", function () {
     });
 
     it("should map for 'copied'", function (done) {
-      git.getStatusByMatcher = function (tester, cb) {
+      git.getStatusByMatcher = function (tester) {
         tester.toString().should.equal("/^(C)\\s/i");
         done();
       };
@@ -119,7 +119,7 @@ describe("gulp-gitmodified", function () {
     });
 
     it("should map for 'updated'", function (done) {
-      git.getStatusByMatcher = function (tester, cb) {
+      git.getStatusByMatcher = function (tester) {
         tester.toString().should.equal("/^(U)\\s/i");
         done();
       };
@@ -128,7 +128,7 @@ describe("gulp-gitmodified", function () {
     });
 
     it("should map for 'untracked'", function (done) {
-      git.getStatusByMatcher = function (tester, cb) {
+      git.getStatusByMatcher = function (tester) {
         tester.toString().should.equal("/^(\\?\\?)\\s/i");
         done();
       };
@@ -137,7 +137,7 @@ describe("gulp-gitmodified", function () {
     });
 
     it("should map for 'ignored'", function (done) {
-      git.getStatusByMatcher = function (tester, cb) {
+      git.getStatusByMatcher = function (tester) {
         tester.toString().should.equal("/^(!!)\\s/i");
         done();
       };
@@ -146,7 +146,7 @@ describe("gulp-gitmodified", function () {
     });
 
     it("should map multiple modes from named strings to multiple short hand", function (done) {
-      git.getStatusByMatcher = function (tester, cb) {
+      git.getStatusByMatcher = function (tester) {
         tester.toString().should.equal("/^(A|D|\\?\\?)\\s/i");
         done();
       };

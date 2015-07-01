@@ -87,8 +87,8 @@ describe("gulp-gitmodified", function () {
     git.getStatusByMatcher(new RegExp("^(M)\\s", "i"), function (err, data) {
       should.not.exist(err);
       data.length.should.equal(2);
-      data[0].should.eql({ mode: 'M', path: 'index.js' });
-      data[1].should.eql({ mode: 'M', path: 'bar.js' });
+      data[0].should.eql({ mode: "M", path: "index.js" });
+      data[1].should.eql({ mode: "M", path: "bar.js" });
       done();
     });
   });
@@ -103,8 +103,8 @@ describe("gulp-gitmodified", function () {
     git.getStatusByMatcher(new RegExp("^(A|D)\\s", "i"), function (err, data) {
       should.not.exist(err);
       data.length.should.equal(2);
-      data[0].should.eql({ mode: 'D', path: 'foo.js' });
-      data[1].should.eql({ mode: 'A', path: 'baz.js' });
+      data[0].should.eql({ mode: "D", path: "foo.js" });
+      data[1].should.eql({ mode: "A", path: "baz.js" });
       done();
     });
   });
@@ -119,9 +119,9 @@ describe("gulp-gitmodified", function () {
     git.getStatusByMatcher(new RegExp("^(C|!!|\\?\\?)\\s", "i"), function (err, data) {
       should.not.exist(err);
       data.length.should.equal(3);
-      data[0].should.eql({ mode: 'C', path: 'index.js' });
-      data[1].should.eql({ mode: '??', path: 'foo.js' });
-      data[2].should.eql({ mode: '!!', path: 'baz.js' });
+      data[0].should.eql({ mode: "C", path: "index.js" });
+      data[1].should.eql({ mode: "??", path: "foo.js" });
+      data[2].should.eql({ mode: "!!", path: "baz.js" });
       done();
     });
   });
