@@ -19,9 +19,9 @@ Then, add it to your `gulpfile.js`:
 var gitmodified = require("gulp-gitmodified");
 
 var files = gulp.src("./src/*.ext")
-	.pipe(gitmodified('modified'))
+  .pipe(gitmodified("modified"));
 
-files.on('data', function (file) {
+files.on("data", function (file) {
   console.log("Modified file:", file);
 });
 ```
@@ -30,18 +30,20 @@ files.on('data', function (file) {
 
 ### gitmodified(statusMode)
 
+For `statusMode`, you can pass a single string value or an array of string values.
+
 `gulp-gitmodified` extends the vinyl file format gulp uses to have a method
-for checking if file is deleted. isDeleted is true if checking for deleted
+for checking if file is deleted. `isDeleted` is true if checking for deleted
 files (see below), and false otherwise.
 
 #### statusMode
-Type: `String`  
+
+Type: `String` || `Array`
 Default: "modified"
 
 What status mode to look for. From git documentation:
 
 ```
-' ' = unmodified
 M = modified
 A = added
 D = deleted
@@ -54,12 +56,12 @@ U = updated but unmerged
 
 (and more if in short format (e.g. AM), see Short Format on [git status man page](https://www.kernel.org/pub/software/scm/git/docs/git-status.html))
 
-Can also use string representation. Examples:
+#### Examples
 
 ```javascript
 // All added files
-gulp.src('./**/*')
-    .pipe(gitmodified('added'))
+gulp.src("./**/*")
+    .pipe(gitmodified("added"))
 ```
 
 ```javascript
@@ -69,12 +71,18 @@ gulp.src('./**/*')
 ```
 
 ```javascript
+// All added and modified files
+gulp.src("./**/*")
+    .pipe(gitmodified(["added", "modified"]))
+```
+
+```javascript
 // All deleted files.
-gulp.src('./**/*')
-    .pipe(gitmodified('deleted'))
-		.on('data', function (file) {
-			console.log(file.isDeleted()); //=> true
-		})
+gulp.src("./**/*")
+    .pipe(gitmodified("deleted"))
+    .on("data", function (file) {
+      console.log(file.isDeleted()); //=> true
+    });
 ```
 
 ## License

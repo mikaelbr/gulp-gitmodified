@@ -1,16 +1,15 @@
 var through = require('through2'),
-  find = require('lodash.find'),
+  _ = require('lodash'),
   gutil = require('gulp-util'),
   git = require('./lib/git'),
   File = require('vinyl');
 
-module.exports = function (mode) {
+module.exports = function (modes) {
   'use strict';
 
   var files = null,
       regexTest,
       modeMapping = {
-    unmodified: '\\s',
     modified: 'M',
     added: 'A',
     deleted: 'D',
@@ -21,17 +20,25 @@ module.exports = function (mode) {
     ignored: '!!'
   };
 
-  if (mode && !!modeMapping[mode.trim().toLowerCase()]) {
-    mode = modeMapping[mode.trim().toLowerCase()];
-  }
-  mode = (mode || 'M').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-  regexTest = new RegExp('^'+mode+'\\s', 'i');
+  if (!_.isArray(modes)) modes = [modes];
+
+  modes = modes.reduce(function(acc, mode) {
+    var mappedMode;
+    if (!_.isString(mode)) return acc;
+    mappedMode = modeMapping[mode.trim().toLowerCase()] || mode;
+    return acc.concat(mappedMode.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'));
+  }, []);
+
+  if (_.isEmpty(modes)) modes = ['M'];
+
+  regexTest = new RegExp('^('+modes.join('|')+')\\s', 'i');
 
   var gitmodified = function (file, enc, callback) {
     var stream = this;
 
     var checkStatus = function () {
-      var isIn = !!find(files, function (line) {
+      var isIn = !!_.find(files, function (fileLine) {
+        var line = fileLine.path;
         if (line.substring(line.length, line.length - 1)) {
           return file.path.indexOf(line.substring(0, line.length - 1)) !== -1;
         }
@@ -55,12 +62,11 @@ module.exports = function (mode) {
       }
       files = statusFiles;
 
-      if (mode === 'D') {
-        // Deleted files. Make into vinyl files
-        files.map(makeVinylFile).forEach(function (file) {
-          stream.push(file);
-        });
-      }
+      // Deleted files. Make into vinyl files
+      files.forEach(function(file) {
+        if (file.mode !== 'D') return;
+        stream.push(makeVinylFile(file.path));
+      });
 
       checkStatus();
     });
