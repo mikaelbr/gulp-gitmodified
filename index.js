@@ -1,5 +1,5 @@
 var through = require('through2'),
-  _ = require('lodash'),
+  find = require('lodash.find'),
   gutil = require('gulp-util'),
   git = require('./lib/git'),
   File = require('vinyl');
@@ -20,16 +20,16 @@ module.exports = function (modes) {
     ignored: '!!'
   };
 
-  if (!_.isArray(modes)) modes = [modes];
+  if (!Array.isArray(modes)) modes = [modes];
 
   modes = modes.reduce(function(acc, mode) {
     var mappedMode;
-    if (!_.isString(mode)) return acc;
+    if (typeof mode !== 'string') return acc;
     mappedMode = modeMapping[mode.trim().toLowerCase()] || mode;
     return acc.concat(mappedMode.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'));
   }, []);
 
-  if (_.isEmpty(modes)) modes = ['M'];
+  if (!modes.length) modes = ['M'];
 
   regexTest = new RegExp('^('+modes.join('|')+')\\s', 'i');
 
@@ -37,7 +37,7 @@ module.exports = function (modes) {
     var stream = this;
 
     var checkStatus = function () {
-      var isIn = !!_.find(files, function (fileLine) {
+      var isIn = !!find(files, function (fileLine) {
         var line = fileLine.path;
         if (line.substring(line.length, line.length - 1)) {
           return file.path.indexOf(line.substring(0, line.length - 1)) !== -1;

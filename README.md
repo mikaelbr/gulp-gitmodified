@@ -16,13 +16,13 @@ npm install --save-dev gulp-gitmodified
 Then, add it to your `gulpfile.js`:
 
 ```javascript
-var gitmodified = require("gulp-gitmodified");
+var gitmodified = require('gulp-gitmodified');
 
-var files = gulp.src("./src/*.ext")
-  .pipe(gitmodified("modified"));
+var files = gulp.src('./src/*.ext')
+  .pipe(gitmodified('modified'));
 
-files.on("data", function (file) {
-  console.log("Modified file:", file);
+files.on('data', function (file) {
+  console.log('Modified file:', file);
 });
 ```
 
@@ -39,7 +39,7 @@ files (see below), and false otherwise.
 #### statusMode
 
 Type: `String` || `Array`
-Default: "modified"
+Default: 'modified'
 
 What status mode to look for. From git documentation:
 
@@ -60,8 +60,8 @@ U = updated but unmerged
 
 ```javascript
 // All added files
-gulp.src("./**/*")
-    .pipe(gitmodified("added"))
+gulp.src('./**/*')
+    .pipe(gitmodified('added'))
 ```
 
 ```javascript
@@ -72,15 +72,15 @@ gulp.src('./**/*')
 
 ```javascript
 // All added and modified files
-gulp.src("./**/*")
-    .pipe(gitmodified(["added", "modified"]))
+gulp.src('./**/*')
+    .pipe(gitmodified(['added', 'modified']))
 ```
 
 ```javascript
 // All deleted files.
-gulp.src("./**/*")
-    .pipe(gitmodified("deleted"))
-    .on("data", function (file) {
+gulp.src('./**/*')
+    .pipe(gitmodified('deleted'))
+    .on('data', function (file) {
       console.log(file.isDeleted()); //=> true
     });
 ```
