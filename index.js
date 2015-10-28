@@ -2,6 +2,7 @@ var through = require('through2'),
   find = require('lodash.find'),
   gutil = require('gulp-util'),
   git = require('./lib/git'),
+  path = require('path'),
   File = require('vinyl');
 
 module.exports = function (modes) {
@@ -38,7 +39,7 @@ module.exports = function (modes) {
 
     var checkStatus = function () {
       var isIn = !!find(files, function (fileLine) {
-        var line = fileLine.path;
+        var line = path.normalize(fileLine.path);
         if (line.substring(line.length, line.length - 1)) {
           return file.path.indexOf(line.substring(0, line.length - 1)) !== -1;
         }
