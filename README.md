@@ -28,13 +28,29 @@ files.on('data', function (file) {
 
 ## API
 
-### gitmodified(statusMode)
+### gitmodified(statusMode|options)
 
 For `statusMode`, you can pass a single string value or an array of string values.
 
 `gulp-gitmodified` extends the vinyl file format gulp uses to have a method
 for checking if file is deleted. `isDeleted` is true if checking for deleted
 files (see below), and false otherwise.
+
+#### `options`
+
+Options can be used to pass in `gitCwd`, to override from which directory
+git should be executed. This is handy in case you have your gulpfile in a
+different directory than your where your repo resides.
+
+```
+// Options can be the following:
+{
+  gitCwd: String,
+  modes: statusMode
+}
+```
+
+`modes` is the value from below. If not defined it will default to `modified`.
 
 #### statusMode
 
@@ -74,6 +90,15 @@ gulp.src('./**/*')
 // All added and modified files
 gulp.src('./**/*')
     .pipe(gitmodified(['added', 'modified']))
+```
+
+```javascript
+// All added and modified files, from different git directory
+gulp.src('./**/*')
+    .pipe(gitmodified({
+      modes: ['added', 'modified'],
+      gitCwd: '../../differentDirectory'
+    }))
 ```
 
 ```javascript
