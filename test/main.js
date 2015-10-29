@@ -70,6 +70,47 @@ describe('gulp-gitmodified', function () {
       var instream = gulp.src(filePath);
       instream.pipe(gitmodified('foo'));
     });
+
+    it('should allow override of git root', function (done, baseDir) {
+      var expected = 'myBaseDir';
+      git.getStatusByMatcher = function (tester, actual) {
+        actual.should.equal(expected);
+        tester.toString().should.equal('/^(foo)\\s/i');
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified({
+        modes: 'foo',
+        gitCwd: expected
+      }));
+    });
+
+    it('should default to modified if only git cwd is passed', function (done, baseDir) {
+      var expected = 'myBaseDir';
+      git.getStatusByMatcher = function (tester, actual) {
+        actual.should.equal(expected);
+        tester.toString().should.equal('/^(M)\\s/i');
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified({
+        gitCwd: expected
+      }));
+    });
+
+    it('should allow override of git root and modes array', function (done, baseDir) {
+      var expected = 'myBaseDir';
+      git.getStatusByMatcher = function (tester, actual) {
+        actual.should.equal(expected);
+        tester.toString().should.equal('/^(foo|bar)\\s/i');
+        done();
+      };
+      var instream = gulp.src(filePath);
+      instream.pipe(gitmodified({
+        modes: ['foo', 'bar'],
+        gitCwd: expected
+      }));
+    });
   });
 
   describe('map mode from named string to short hand', function () {
@@ -156,7 +197,11 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should return modified files', function (done) {
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, cb) {
+      if (typeof baseDir === 'function') {
+        cb = baseDir;
+        baseDir = void 0;
+      }
       cb(null, [{ path: 'a.txt', mode: 'M' }]);
     };
     var instream = gulp.src(filePath);
@@ -172,7 +217,11 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should return deleted files', function (done) {
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, cb) {
+      if (typeof baseDir === 'function') {
+        cb = baseDir;
+        baseDir = void 0;
+      }
       cb(null, [{ path: 'a.txt', mode: 'D' }]);
     };
     var instream = gulp.src(filePath);
@@ -187,7 +236,11 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should throw error when git returns error', function (done) {
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, cb) {
+      if (typeof baseDir === 'function') {
+        cb = baseDir;
+        baseDir = void 0;
+      }
       return cb(new Error('new error'));
     };
     var instream = gulp.src(filePath);
@@ -201,7 +254,11 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should throw gulp specific error', function (done) {
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, cb) {
+      if (typeof baseDir === 'function') {
+        cb = baseDir;
+        baseDir = void 0;
+      }
       return cb(new Error('new error'));
     };
     var instream = gulp.src(filePath);
@@ -216,7 +273,11 @@ describe('gulp-gitmodified', function () {
 
   it('should pass on no files when no status is returned', function (done) {
     var numFiles = 0;
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, cb) {
+      if (typeof baseDir === 'function') {
+        cb = baseDir;
+        baseDir = void 0;
+      }
       cb(null, []);
     };
     var instream = gulp.src(filePath);
@@ -240,7 +301,11 @@ describe('gulp-gitmodified', function () {
       contents: fs.createReadStream(join(__dirname, '/fixtures/a.txt'))
     });
 
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, cb) {
+      if (typeof baseDir === 'function') {
+        cb = baseDir;
+        baseDir = void 0;
+      }
       cb(null, [{ path: 'a.txt', mode: 'M' }]);
     };
     var outstream = gitmodified();
@@ -258,7 +323,11 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should handle folders', function (done) {
-    git.getStatusByMatcher = function (tester, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, cb) {
+      if (typeof baseDir === 'function') {
+        cb = baseDir;
+        baseDir = void 0;
+      }
       cb(null, [{ path: 'fixtures/', mode: 'M' }]);
     };
 

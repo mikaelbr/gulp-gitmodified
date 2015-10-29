@@ -7,6 +7,7 @@ var through = require('through2'),
 
 module.exports = function (modes) {
   'use strict';
+  var options = {};
 
   var files = null,
       regexTest,
@@ -21,6 +22,10 @@ module.exports = function (modes) {
     ignored: '!!'
   };
 
+  if (typeof modes === 'object' && (!!modes.modes || !!modes.gitCwd)) {
+    options = modes;
+    modes = modes.modes || [];
+  }
   if (!Array.isArray(modes)) modes = [modes];
 
   modes = modes.reduce(function(acc, mode) {
@@ -56,7 +61,7 @@ module.exports = function (modes) {
     if (!!files) {
       return checkStatus();
     }
-    git.getStatusByMatcher(regexTest, function (err, statusFiles) {
+    git.getStatusByMatcher(regexTest, options.gitCwd, function (err, statusFiles) {
       if (err) {
         stream.emit('error', new gutil.PluginError('gulp-gitmodified', err));
         return callback();

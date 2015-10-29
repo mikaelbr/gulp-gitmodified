@@ -41,6 +41,20 @@ describe('gulp-gitmodified', function () {
     });
   });
 
+  it('should pass on cwd', function (done) {
+    git.which = function (app, cb) {
+      cb();
+    };
+    git.exec = function (app, args, extra, cb) {
+      extra.cwd.should.equal('foo');
+      done();
+    };
+    git.getStatusByMatcher(new RegExp('^(M)\\s', 'i'), 'foo', function (err) {
+      should(err.message).equal('git not found on your system.');
+      done();
+    });
+  });
+
   it('should return a file returned by git status', function (done) {
     git.which = function (app, cb) {
       cb();
