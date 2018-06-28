@@ -38,14 +38,17 @@ files (see below), and false otherwise.
 
 #### `options`
 
-Options can be used to pass in `gitCwd`, to override from which directory
+`gitCwd` can be used to override from which directory
 git should be executed. This is handy in case you have your gulpfile in a
 different directory than your where your repo resides.
+
+`stagedOnly` can be used to process only staged files.
 
 ```
 // Options can be the following:
 {
   gitCwd: String,
+  stagedOnly: Boolean,
   modes: statusMode
 }
 ```
@@ -93,10 +96,11 @@ gulp.src('./**/*')
 ```
 
 ```javascript
-// All added and modified files, from different git directory
+// All added and modified staged files, from different git directory
 gulp.src('./**/*')
     .pipe(gitmodified({
       modes: ['added', 'modified'],
+      stagedOnly: true,
       gitCwd: '../../differentDirectory'
     }))
 ```

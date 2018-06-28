@@ -197,7 +197,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should return modified files', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
       if (typeof baseDir === 'function') {
         cb = baseDir;
         baseDir = void 0;
@@ -217,7 +217,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should return deleted files', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
       if (typeof baseDir === 'function') {
         cb = baseDir;
         baseDir = void 0;
@@ -236,7 +236,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should throw error when git returns error', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
       if (typeof baseDir === 'function') {
         cb = baseDir;
         baseDir = void 0;
@@ -254,7 +254,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should throw gulp specific error', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
       if (typeof baseDir === 'function') {
         cb = baseDir;
         baseDir = void 0;
@@ -273,7 +273,7 @@ describe('gulp-gitmodified', function () {
 
   it('should pass on no files when no status is returned', function (done) {
     var numFiles = 0;
-    git.getStatusByMatcher = function (tester, baseDir, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
       if (typeof baseDir === 'function') {
         cb = baseDir;
         baseDir = void 0;
@@ -301,7 +301,7 @@ describe('gulp-gitmodified', function () {
       contents: fs.createReadStream(join(__dirname, '/fixtures/a.txt'))
     });
 
-    git.getStatusByMatcher = function (tester, baseDir, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
       if (typeof baseDir === 'function') {
         cb = baseDir;
         baseDir = void 0;
@@ -323,7 +323,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should handle folders', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, cb) {
+    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
       if (typeof baseDir === 'function') {
         cb = baseDir;
         baseDir = void 0;
