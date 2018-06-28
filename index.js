@@ -7,7 +7,9 @@ var through = require('through2'),
 
 module.exports = function (modes) {
   'use strict';
-  var options = {};
+  var options = {
+    stagedOnly: false,
+  };
 
   var files = null,
       regexTest,
@@ -61,7 +63,7 @@ module.exports = function (modes) {
     if (!!files) {
       return checkStatus();
     }
-    git.getStatusByMatcher(regexTest, options.gitCwd, function (err, statusFiles) {
+    git.getStatusByMatcher(regexTest, options.gitCwd, options.stagedOnly, function (err, statusFiles) {
       if (err) {
         stream.emit('error', new gutil.PluginError('gulp-gitmodified', err));
         return callback();
