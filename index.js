@@ -1,6 +1,6 @@
 var through = require('through2'),
   find = require('lodash.find'),
-  gutil = require('gulp-util'),
+  PluginError = require('plugin-error'),
   git = require('./lib/git'),
   path = require('path'),
   File = require('vinyl');
@@ -65,7 +65,7 @@ module.exports = function (modes) {
     }
     git.getStatusByMatcher(regexTest, options.gitCwd, options.stagedOnly, function (err, statusFiles) {
       if (err) {
-        stream.emit('error', new gutil.PluginError('gulp-gitmodified', err));
+        stream.emit('error', new PluginError('gulp-gitmodified', err));
         return callback();
       }
       files = statusFiles;
