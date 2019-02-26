@@ -43,14 +43,13 @@ module.exports = function (modes) {
   let regexTest;
   let options = defaultOptions;
 
-  if (typeof modes === 'object' && (!!modes.modes || !!modes.gitCwd)) {
+  if (typeof modes === 'object' && !Array.isArray(modes)) {
     options = modes;
     modes = modes.modes || [];
   }
   if (!Array.isArray(modes)) {
     modes = [modes];
   }
-
   if (options.stagedOnly && options.targetBranch) {
     throw new PluginError('gulp-gitmodified', 'stageOnly and targetBranch can\'t be used together');
   }

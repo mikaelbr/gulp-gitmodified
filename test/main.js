@@ -71,7 +71,7 @@ describe('gulp-gitmodified', function () {
       instream.pipe(gitmodified('foo'));
     });
 
-    it('should allow override of git root', function (done, baseDir) {
+    it('should allow override of git root', function (done) {
       var expected = 'myBaseDir';
       git.getStatusByMatcher = function (tester, actual) {
         actual.should.equal(expected);
@@ -85,7 +85,7 @@ describe('gulp-gitmodified', function () {
       }));
     });
 
-    it('should default to modified if only git cwd is passed', function (done, baseDir) {
+    it('should default to modified if only git cwd is passed', function (done) {
       var expected = 'myBaseDir';
       git.getStatusByMatcher = function (tester, actual) {
         actual.should.equal(expected);
@@ -98,7 +98,7 @@ describe('gulp-gitmodified', function () {
       }));
     });
 
-    it('should allow override of git root and modes array', function (done, baseDir) {
+    it('should allow override of git root and modes array', function (done) {
       var expected = 'myBaseDir';
       git.getStatusByMatcher = function (tester, actual) {
         actual.should.equal(expected);
@@ -197,11 +197,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should return modified files', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       cb(null, [{ path: 'a.txt', mode: 'M' }]);
     };
     var instream = gulp.src(filePath);
@@ -217,11 +213,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should return deleted files', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       cb(null, [{ path: 'a.txt', mode: 'D' }]);
     };
     var instream = gulp.src(filePath);
@@ -236,11 +228,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should throw error when git returns error', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       return cb(new Error('new error'));
     };
     var instream = gulp.src(filePath);
@@ -254,11 +242,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should throw gulp specific error', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       return cb(new Error('new error'));
     };
     var instream = gulp.src(filePath);
@@ -273,11 +257,7 @@ describe('gulp-gitmodified', function () {
 
   it('should pass on no files when no status is returned', function (done) {
     var numFiles = 0;
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       cb(null, []);
     };
     var instream = gulp.src(filePath);
@@ -301,11 +281,7 @@ describe('gulp-gitmodified', function () {
       contents: fs.createReadStream(join(__dirname, '/fixtures/a.txt'))
     });
 
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       cb(null, [{ path: 'a.txt', mode: 'M' }]);
     };
     var outstream = gitmodified();
@@ -323,11 +299,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should handle folders', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       cb(null, [{ path: 'fixtures/', mode: 'M' }]);
     };
 
