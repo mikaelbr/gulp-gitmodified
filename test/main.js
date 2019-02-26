@@ -1,20 +1,18 @@
 /*global describe, it*/
-'use strict';
-
-var should = require('should'),
-  through = require('through2'),
-  fs = require('fs'),
-  join = require('path').join,
-  git = require('../lib/git');
+const should = require('should');
+const through = require('through2');
+const fs = require('fs');
+const File = require('vinyl');
+const { join } = require('path');
+const git = require('../lib/git');
 
 require('mocha');
 
-var filePath = join(__dirname, './fixtures/*.txt'),
-    expectedFile = join(__dirname, './fixtures/a.txt');
+const filePath = join(__dirname, './fixtures/*.txt');
+const expectedFile = join(__dirname, './fixtures/a.txt');
 
-var gutil = require('gulp-util'),
-  gulp = require('gulp'),
-  gitmodified = require('../');
+const gulp = require('gulp');
+const gitmodified = require('../');
 
 describe('gulp-gitmodified', function () {
 
@@ -23,6 +21,20 @@ describe('gulp-gitmodified', function () {
     should.exist(stream.on);
     should.exist(stream.write);
     done();
+  });
+
+  it('should give error if stagedOnly used together with targetBranch', () => {
+    let error;
+    try {
+      gitmodified({
+        targetBranch: 'origin/master',
+        stagedOnly: true,
+      });
+    } catch (e) {
+      error = e;
+    }
+    should.exist(error && error.message);
+    error.message.should.equal('stageOnly and targetBranch can\'t be used together');
   });
 
   it('should call git library with a tester', function (done) {
@@ -274,7 +286,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should handle streamed files', function (done) {
-    var streamedFile = new gutil.File({
+    var streamedFile = new File({
       path: 'test/fixtures/a.txt',
       cwd: 'test/',
       base: 'test/fixtures/',
