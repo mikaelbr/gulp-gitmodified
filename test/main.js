@@ -1,20 +1,18 @@
 /*global describe, it*/
-'use strict';
-
-var should = require('should'),
-  through = require('through2'),
-  fs = require('fs'),
-  join = require('path').join,
-  git = require('../lib/git');
+const should = require('should');
+const through = require('through2');
+const fs = require('fs');
+const File = require('vinyl');
+const { join } = require('path');
+const git = require('../lib/git');
 
 require('mocha');
 
-var filePath = join(__dirname, './fixtures/*.txt'),
-    expectedFile = join(__dirname, './fixtures/a.txt');
+const filePath = join(__dirname, './fixtures/*.txt');
+const expectedFile = join(__dirname, './fixtures/a.txt');
 
-var gutil = require('gulp-util'),
-  gulp = require('gulp'),
-  gitmodified = require('../');
+const gulp = require('gulp');
+const gitmodified = require('../');
 
 describe('gulp-gitmodified', function () {
 
@@ -23,6 +21,20 @@ describe('gulp-gitmodified', function () {
     should.exist(stream.on);
     should.exist(stream.write);
     done();
+  });
+
+  it('should give error if stagedOnly used together with targetBranch', () => {
+    let error;
+    try {
+      gitmodified({
+        targetBranch: 'origin/master',
+        stagedOnly: true,
+      });
+    } catch (e) {
+      error = e;
+    }
+    should.exist(error && error.message);
+    error.message.should.equal('stageOnly and targetBranch can\'t be used together');
   });
 
   it('should call git library with a tester', function (done) {
@@ -71,7 +83,7 @@ describe('gulp-gitmodified', function () {
       instream.pipe(gitmodified('foo'));
     });
 
-    it('should allow override of git root', function (done, baseDir) {
+    it('should allow override of git root', function (done) {
       var expected = 'myBaseDir';
       git.getStatusByMatcher = function (tester, actual) {
         actual.should.equal(expected);
@@ -85,7 +97,7 @@ describe('gulp-gitmodified', function () {
       }));
     });
 
-    it('should default to modified if only git cwd is passed', function (done, baseDir) {
+    it('should default to modified if only git cwd is passed', function (done) {
       var expected = 'myBaseDir';
       git.getStatusByMatcher = function (tester, actual) {
         actual.should.equal(expected);
@@ -98,7 +110,7 @@ describe('gulp-gitmodified', function () {
       }));
     });
 
-    it('should allow override of git root and modes array', function (done, baseDir) {
+    it('should allow override of git root and modes array', function (done) {
       var expected = 'myBaseDir';
       git.getStatusByMatcher = function (tester, actual) {
         actual.should.equal(expected);
@@ -197,11 +209,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should return modified files', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       cb(null, [{ path: 'a.txt', mode: 'M' }]);
     };
     var instream = gulp.src(filePath);
@@ -217,11 +225,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should return deleted files', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       cb(null, [{ path: 'a.txt', mode: 'D' }]);
     };
     var instream = gulp.src(filePath);
@@ -236,11 +240,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should throw error when git returns error', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       return cb(new Error('new error'));
     };
     var instream = gulp.src(filePath);
@@ -254,11 +254,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should throw gulp specific error', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       return cb(new Error('new error'));
     };
     var instream = gulp.src(filePath);
@@ -273,11 +269,7 @@ describe('gulp-gitmodified', function () {
 
   it('should pass on no files when no status is returned', function (done) {
     var numFiles = 0;
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       cb(null, []);
     };
     var instream = gulp.src(filePath);
@@ -294,18 +286,14 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should handle streamed files', function (done) {
-    var streamedFile = new gutil.File({
+    var streamedFile = new File({
       path: 'test/fixtures/a.txt',
       cwd: 'test/',
       base: 'test/fixtures/',
       contents: fs.createReadStream(join(__dirname, '/fixtures/a.txt'))
     });
 
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       cb(null, [{ path: 'a.txt', mode: 'M' }]);
     };
     var outstream = gitmodified();
@@ -323,11 +311,7 @@ describe('gulp-gitmodified', function () {
   });
 
   it('should handle folders', function (done) {
-    git.getStatusByMatcher = function (tester, baseDir, stagedOnly, cb) {
-      if (typeof baseDir === 'function') {
-        cb = baseDir;
-        baseDir = void 0;
-      }
+    git.getStatusByMatcher = function (tester, baseDir, { stagedOnly, targetBranch } = {}, cb = baseDir) {
       cb(null, [{ path: 'fixtures/', mode: 'M' }]);
     };
 

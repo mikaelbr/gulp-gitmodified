@@ -44,11 +44,16 @@ different directory than your where your repo resides.
 
 `stagedOnly` can be used to process only staged files.
 
+`targetBranch` can be used to get diff between current branch and targetBranch. 
+Actually `git diff --name-status targetBranch` will be executed.  
+It can't be used together with `stagedOnly`.
+
 ```
 // Options can be the following:
 {
   gitCwd: String,
   stagedOnly: Boolean,
+  targetBranch: String
   modes: statusMode
 }
 ```
@@ -93,6 +98,15 @@ gulp.src('./**/*')
 // All added and modified files
 gulp.src('./**/*')
     .pipe(gitmodified(['added', 'modified']))
+```
+
+```javascript
+// All added files on this branch
+gulp.src('./**/*')
+    .pipe(gitmodified({ 
+      modes: ['added', 'modified'],
+      targetBranch: 'origin/master'
+    }))
 ```
 
 ```javascript
