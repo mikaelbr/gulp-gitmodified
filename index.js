@@ -73,7 +73,7 @@ module.exports = function (modes) {
 
     const checkStatus = () => {
       const isIn = !!files.find((fileLine) => {
-        const line = path.normalize(fileLine.path);
+        const line = path.normalize(fileLine.path).replaceAll(/^\"|\"$/g, '');;
         if (line.substring(line.length, line.length - 1)) {
           return file.path.indexOf(line.substring(0, line.length - 1)) !== -1;
         }
