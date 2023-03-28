@@ -1,52 +1,79 @@
-var through = require('through2'),
-  find = require('lodash.find'),
-  PluginError = require('plugin-error'),
-  git = require('./lib/git'),
-  path = require('path'),
-  File = require('vinyl');
+const through = require('through2');
+const PluginError = require('plugin-error');
+const path = require('path');
+const File = require('vinyl');
+
+const git = require('./lib/git');
+
+const ModeMapping = {
+  modified: 'M',
+  added: 'A',
+  deleted: 'D',
+  renamed: 'R',
+  copied: 'C',
+  updated: 'U',
+  untracked: '??',
+  ignored: '!!',
+};
+
+function setDeleted(file, isDeleted) {
+  file.isDeleted = () => {
+    return !!isDeleted;
+  };
+}
+
+function makeVinylFile(path) {
+  const file = new File({
+    path: path,
+    contents: null,
+  });
+  setDeleted(file, true);
+  return file;
+}
 
 module.exports = function (modes) {
-  'use strict';
-  var options = {
+  let defaultOptions = {
     stagedOnly: false,
+    targetBranch: undefined,
+    gitCwd: undefined,
+    modes: ['M'],
   };
 
-  var files = null,
-      regexTest,
-      modeMapping = {
-    modified: 'M',
-    added: 'A',
-    deleted: 'D',
-    renamed: 'R',
-    copied: 'C',
-    updated: 'U',
-    untracked: '??',
-    ignored: '!!'
-  };
+  let files;
+  let regexTest;
+  let options = defaultOptions;
 
-  if (typeof modes === 'object' && (!!modes.modes || !!modes.gitCwd)) {
+  if (typeof modes === 'object' && !Array.isArray(modes)) {
     options = modes;
     modes = modes.modes || [];
   }
-  if (!Array.isArray(modes)) modes = [modes];
+  if (!Array.isArray(modes)) {
+    modes = [modes];
+  }
+  if (options.stagedOnly && options.targetBranch) {
+    throw new PluginError('gulp-gitmodified', 'stageOnly and targetBranch can\'t be used together');
+  }
 
-  modes = modes.reduce(function(acc, mode) {
-    var mappedMode;
-    if (typeof mode !== 'string') return acc;
-    mappedMode = modeMapping[mode.trim().toLowerCase()] || mode;
+  modes = modes.reduce((acc, mode) => {
+    if (typeof mode !== 'string') {
+      return acc;
+    }
+    const mappedMode = ModeMapping[mode.trim().toLowerCase()] || mode;
     return acc.concat(mappedMode.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'));
   }, []);
 
-  if (!modes.length) modes = ['M'];
+  if (!modes.length) {
+    modes = defaultOptions.modes;
+  }
 
-  regexTest = new RegExp('^('+modes.join('|')+')\\s', 'i');
+  regexTest = new RegExp('^(' + modes.join('|') + ')\\s', 'i');
 
-  var gitmodified = function (file, enc, callback) {
-    var stream = this;
+  const gitmodified = function (file, enc, callback) {
+    const stream = this;
 
-    var checkStatus = function () {
-      var isIn = !!find(files, function (fileLine) {
-        var line = path.normalize(fileLine.path);
+    const checkStatus = () => {
+      const isIn = !!files.find((fileLine) => {
+        const line = path.normalize(fileLine.path).replaceAll(/^\"|\"$/g, '');;
         if (line.substring(line.length, line.length - 1)) {
           return file.path.indexOf(line.substring(0, line.length - 1)) !== -1;
         }
@@ -63,7 +90,7 @@ module.exports = function (modes) {
     if (!!files) {
       return checkStatus();
     }
-    git.getStatusByMatcher(regexTest, options.gitCwd, options.stagedOnly, function (err, statusFiles) {
+    git.getStatusByMatcher(regexTest, options.gitCwd, options, (err, statusFiles) => {
       if (err) {
         stream.emit('error', new PluginError('gulp-gitmodified', err));
         return callback();
@@ -71,8 +98,10 @@ module.exports = function (modes) {
       files = statusFiles;
 
       // Deleted files. Make into vinyl files
-      files.forEach(function(file) {
-        if (file.mode !== 'D') return;
+      files.forEach(function (file) {
+        if (file.mode !== 'D') {
+          return;
+        }
         stream.push(makeVinylFile(file.path));
       });
 
@@ -81,20 +110,7 @@ module.exports = function (modes) {
   };
 
   return through.obj(gitmodified, function (callback) {
-    files = null;
+    files = undefined;
     return callback();
   });
 };
-
-function makeVinylFile (path) {
-  var file = new File({
-    path: path,
-    contents: null
-  });
-  setDeleted(file, true);
-  return file;
-}
-
-function setDeleted (file, isDeleted) {
-  file.isDeleted = function () { return !!isDeleted; };
-}
